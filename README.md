@@ -108,9 +108,6 @@ The config.properties file contains key test configurations:
 # Base URL of the e-commerce site
 base.url=https://www.edgewordstraining.co.uk/demo-site
 
-# Login credentials
-username=hello@2itesting.co.uk
-password=12iTestingProject
 
 # Billing details
 billing.firstname=John
