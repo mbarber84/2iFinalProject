@@ -50,7 +50,7 @@ public class BaseTests {
         }
 
         driver.manage().window().maximize(); // Make the browser full screen
-        wait = new WebDriverWait(driver, Duration.ofSeconds(15)); // Wait up to 15 seconds for things to appear
+        wait = new WebDriverWait(driver, Duration.ofSeconds(7)); // Wait up to 7 seconds for things to appear
         helpers = new Helpers(); // Create a helpers object to use utility functions
 
         // Initialize basic components first (these are independent)

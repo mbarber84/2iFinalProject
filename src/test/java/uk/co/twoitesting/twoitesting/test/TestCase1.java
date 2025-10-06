@@ -50,7 +50,7 @@ public class TestCase1 extends BaseTests { // Inherits setup and teardown from B
     void testPurchaseWithDiscount(TestData data) {
 
         // Step 1: Login and clean the cart
-        Allure.step("Login to site and clean cart", () -> {
+        //Allure.step("Login to site and clean cart", () -> {
             loginPOM.open(); // Open login page
             loginPOM.login(); // Login using credentials from config
             Helpers.takeScreenshot(driver, "Login Success"); // Take screenshot
@@ -59,10 +59,10 @@ public class TestCase1 extends BaseTests { // Inherits setup and teardown from B
             navPOM.goToCart(); // Go to cart
             cartPOM.removeCoupon(data.coupon.code()); // Remove any existing coupon
             cartPOM.removeProduct(); // Remove any existing products
-        });
+        //});
 
         // Step 2: Add product and apply discount
-        Allure.step("Add product and apply discount", () -> {
+        //Allure.step("Add product and apply discount", () -> {
             navPOM.goToShop(); // Go to Shop page
             shopPOM.dismissPopupIfPresent(); // Dismiss any popup
             shopPOM.addProductToCart(data.product); // Add product to cart
@@ -112,7 +112,7 @@ public class TestCase1 extends BaseTests { // Inherits setup and teardown from B
             cartPOM.removeProduct();
 
             Assertions.assertEquals(0, cartPOM.getCartItemCount(), "Cart should be empty after cleanup");
-        });
+       // });
     }
 
     // Inner record class to store a combination of product and coupon
