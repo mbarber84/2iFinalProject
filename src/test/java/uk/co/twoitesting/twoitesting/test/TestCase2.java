@@ -1,71 +1,71 @@
-// Define the package where this test class belongs
+// This is the folder (package) where this test class is stored
 package uk.co.twoitesting.twoitesting.test;
 
-// Import JUnit assertion and test annotations
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
-// Import base test class containing setup and teardown
+// Import JUnit tools for testing and assertions
+import org.junit.jupiter.api.Assertions; // To check if something is true
+import org.junit.jupiter.api.Tag; // To tag tests
+import org.junit.jupiter.api.Test; // To mark a method as a test
 import uk.co.twoitesting.twoitesting.basetests.BaseTests;
-
-// Import POM classes for page interactions
 import uk.co.twoitesting.twoitesting.pomclasses.*;
-import uk.co.twoitesting.twoitesting.pomclasses.componentPOM.NavPOM;
-
-// Import helper utilities for screenshots
 import uk.co.twoitesting.twoitesting.utilities.Helpers;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-// Define the TestCase2 class, extending BaseTests for setup/teardown
+// Define TestCase2 class that extends BaseTests
 public class TestCase2 extends BaseTests {
 
-    @Test
-    @Tag("RunMe")
+    @Test // Marks this method as a test
+    @Tag("RunMe") // Tag the test
     void testCompletePurchase() {
-        // LOGIN
-        loginPOM.open();
-        loginPOM.login();
-        Helpers.takeScreenshot(driver, "Login Success");
 
-        // Assertion: user logged in
+        // LOGIN
+
+        loginPOM.open(); // Open login page
+        loginPOM.login(); // Login with credentials from config
+        Helpers.takeScreenshot(driver, "Login Success"); // Take a screenshot
+
+        // Verify login was successful
         Assertions.assertTrue(loginPOM.isUserLoggedIn(),
                 "User should be logged in after login");
 
         // CLEAN CART
-        navPOM.goToCart();
-        cartPOM.removeProduct();
+
+        navPOM.goToCart(); // Go to cart page
+        cartPOM.removeProduct(); // Remove any existing products
 
         // ADD PRODUCT
-        navPOM.goToShop();
-        shopPOM.dismissPopupIfPresent();
-        shopPOM.addProductToCart("Polo");
-        navPOM.goToCart();
-        Helpers.takeScreenshot(driver, "Cart Ready");
+
+        navPOM.goToShop(); // Go to shop page
+        shopPOM.dismissPopupIfPresent(); // Close any popup if it appears
+        shopPOM.addProductToCart("Polo"); // Add "Polo" shirt to cart
+        navPOM.goToCart(); // Go back to cart
+        Helpers.takeScreenshot(driver, "Cart Ready"); // Take a screenshot
 
         // CHECKOUT
-        navPOM.goToCheckout();
-        checkoutPOM.fillBillingDetailsFromConfig();
-        Helpers.takeScreenshot(driver, "Billing Details Entered");
-        checkoutPOM.selectCheckPayments();
-        checkoutPOM.placeOrder();
+
+        navPOM.goToCheckout(); // Go to checkout page
+        checkoutPOM.fillBillingDetailsFromConfig(); // Fill in billing info from config
+        Helpers.takeScreenshot(driver, "Billing Details Entered"); // Screenshot
+        checkoutPOM.selectCheckPayments(); // Choose "Check" as payment method
+        checkoutPOM.placeOrder(); // Place the order
 
         // CAPTURE ORDER NUMBER
-        String orderNumber = checkoutPOM.captureOrderNumber();
-        System.out.println("Captured Order Number: " + orderNumber);
-        Helpers.takeScreenshot(driver, "Order Placed - " + orderNumber);
+
+        String orderNumber = checkoutPOM.captureOrderNumber(); // Get order number
+        System.out.println("Captured Order Number: " + orderNumber); // Print it
+        Helpers.takeScreenshot(driver, "Order Placed - " + orderNumber); // Screenshot
 
         // VERIFY ORDER
+
         assertThat("Order " + orderNumber + " should appear in My Account -> Orders",
-                ordersPOM.isOrderPresent(orderNumber), is(true));
+                ordersPOM.isOrderPresent(orderNumber), is(true)); // Check if order exists
 
         // CLEANUP
-        cartPOM.removeProduct();
-        Helpers.takeScreenshot(driver, "Cart Emptied");
 
-        accountPOM.logout();
-        Helpers.takeScreenshot(driver, "Logged Out");
+        cartPOM.removeProduct(); // Empty the cart
+        Helpers.takeScreenshot(driver, "Cart Emptied"); // Screenshot
+
+        accountPOM.logout(); // Logout user
+        Helpers.takeScreenshot(driver, "Logged Out"); // Screenshot
     }
 }

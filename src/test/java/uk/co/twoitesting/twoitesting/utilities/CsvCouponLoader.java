@@ -1,51 +1,50 @@
-// Define the package where this class belongs
+// This is the folder (package) where this class is stored
 package uk.co.twoitesting.twoitesting.utilities;
 
-// Import classes for file reading
+// Import classes to read files line by line
+import java.io.BufferedReader; // Reads text from a file efficiently
+import java.io.FileReader;     // Reads bytes from a file and converts to characters
+import java.io.IOException;    // Handles errors if reading fails
+import java.util.ArrayList;    // List that can grow in size
+import java.util.List;         // Interface for lists
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-// Define CsvCouponLoader utility class to read coupons from a CSV file
+// Define a class to load coupon data from a CSV file
 public class CsvCouponLoader {
 
-    // Static method to load coupons from a CSV file
+    // Method to load coupons from a CSV file
     public static List<CouponData> loadCoupons(String filePath) {
-        // Initialize an empty list to store CouponData objects
+        // Create an empty list to store coupons
         List<CouponData> coupons = new ArrayList<>();
 
-        // Use try-with-resources to automatically close BufferedReader
+        // Try-with-resources ensures the file is closed automatically
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;                 // Variable to store each line of the CSV
-            boolean firstLine = true;    // Flag to skip the header row
+            String line;                 // To store each line of the file
+            boolean firstLine = true;    // Flag to skip the header row (first line)
 
-            // Read the CSV file line by line
+            // Read the file line by line
             while ((line = br.readLine()) != null) {
                 if (firstLine) {         // Skip the header line
                     firstLine = false;
-                    continue;
+                    continue;            // Skip to the next line
                 }
 
-                // Split the CSV line into parts using comma as delimiter
+                // Split the line into parts using comma as separator
                 String[] parts = line.split(",");
-                // Ensure the line has exactly 3 parts (key, code, discount)
+                // Make sure the line has exactly 3 columns: key, code, discount
                 if (parts.length == 3) {
-                    String key = parts[0].trim();           // First column: coupon key
-                    String code = parts[1].trim();          // Second column: coupon code
-                    double discount = Double.parseDouble(parts[2].trim()); // Third column: discount value
+                    String key = parts[0].trim();                       // Coupon name
+                    String code = parts[1].trim();                      // Coupon code
+                    double discount = Double.parseDouble(parts[2].trim()); // Discount value as number
 
-                    // Add a new CouponData object to the list
+                    // Create a new CouponData object and add it to the list
                     coupons.add(new CouponData(key, code, discount));
                 }
             }
-        } catch (IOException e) { // Handle exceptions if the file cannot be read
-            throw new RuntimeException("Failed to load coupons from CSV", e);
+        } catch (IOException e) { // If the file cannot be read
+            throw new RuntimeException("Failed to load coupons from CSV", e); // Stop program and show error
         }
 
-        // Return the list of loaded coupons
+        // Return the list of coupons that were loaded
         return coupons;
     }
 }
