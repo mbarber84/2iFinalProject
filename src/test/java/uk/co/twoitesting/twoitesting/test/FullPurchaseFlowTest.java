@@ -6,13 +6,12 @@ import org.junit.jupiter.api.Assertions; // To check if something is true
 import org.junit.jupiter.api.Tag; // To tag tests
 import org.junit.jupiter.api.Test; // To mark a method as a test
 import uk.co.twoitesting.twoitesting.basetests.BaseTests;
-import uk.co.twoitesting.twoitesting.pomclasses.*;
 import uk.co.twoitesting.twoitesting.utilities.Helpers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 // Define TestCase2 class that extends BaseTests
-public class TestCase2 extends BaseTests {
+public class FullPurchaseFlowTest extends BaseTests {
 
     @Test // Marks this method as a test
     @Tag("RunMe") // Tag the test

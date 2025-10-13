@@ -2,7 +2,6 @@
 package uk.co.twoitesting.twoitesting.test;
 
 // Import Allure annotations and tools for reporting
-import io.qameta.allure.Allure;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -15,7 +14,6 @@ import org.junit.jupiter.params.provider.MethodSource; // To provide test data
 
 // Import base test class and POMs
 import uk.co.twoitesting.twoitesting.basetests.BaseTests;
-import uk.co.twoitesting.twoitesting.pomclasses.*;
 import uk.co.twoitesting.twoitesting.utilities.CouponData;
 import uk.co.twoitesting.twoitesting.utilities.CsvCouponLoader;
 import uk.co.twoitesting.twoitesting.utilities.Helpers;
@@ -26,7 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 // Define a test class for testing purchases with discounts
-public class TestCase1 extends BaseTests { // Inherits setup and teardown from BaseTests
+public class CouponTest extends BaseTests { // Inherits setup and teardown from BaseTests
 
     // This method provides the test data (products + coupons)
     static Stream<TestData> dataProvider() {
