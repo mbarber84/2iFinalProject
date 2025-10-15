@@ -1,70 +1,96 @@
-// This is the folder (package) where this test class is stored
 package uk.co.twoitesting.twoitesting.test;
 
-// Import JUnit tools for testing and assertions
-import org.junit.jupiter.api.Assertions; // To check if something is true
-import org.junit.jupiter.api.Tag; // To tag tests
-import org.junit.jupiter.api.Test; // To mark a method as a test
+import io.qameta.allure.*;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import uk.co.twoitesting.twoitesting.basetests.BaseTests;
 import uk.co.twoitesting.twoitesting.utilities.Helpers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-// Define TestCase2 class that extends BaseTests
 public class FullPurchaseFlowTest extends BaseTests {
 
-    @Test // Marks this method as a test
-    @Tag("RunMe") // Tag the test
+    @Test
+    @Tag("RunMe")
+    @Epic("Shop Tests")
+    @Feature("End-to-End Purchase Flow")
+    @Story("User can complete a full purchase and verify order")
     void testCompletePurchase() {
 
-        // LOGIN
+        // GIVEN: User is logged in and cart is empty
+        loginUser();
+        verifyUserLoggedIn();
+        emptyCart();
 
-        loginPOM.open(); // Open login page
-        loginPOM.login(); // Login with credentials from config
-        Helpers.takeScreenshot(driver, "Login Success"); // Take a screenshot
+        // WHEN: User adds product to cart and proceeds to checkout
+        addProductToCart("Polo");
+        proceedToCheckout();
 
-        // Verify login was successful
-        Assertions.assertTrue(loginPOM.isUserLoggedIn(),
-                "User should be logged in after login");
-
-        // CLEAN CART
-
-        navPOM.goToCart(); // Go to cart page
-        cartPOM.removeProduct(); // Remove any existing products
-
-        // ADD PRODUCT
-
-        navPOM.goToShop(); // Go to shop page
-        shopPOM.dismissPopupIfPresent(); // Close any popup if it appears
-        shopPOM.addProductToCart("Polo"); // Add "Polo" shirt to cart
-        navPOM.goToCart(); // Go back to cart
-        Helpers.takeScreenshot(driver, "Cart Ready"); // Take a screenshot
-
-        // CHECKOUT
-
-        navPOM.goToCheckout(); // Go to checkout page
-        checkoutPOM.fillBillingDetailsFromConfig(); // Fill in billing info from config
-        Helpers.takeScreenshot(driver, "Billing Details Entered"); // Screenshot
-        checkoutPOM.selectCheckPayments(); // Choose "Check" as payment method
-        checkoutPOM.placeOrder(); // Place the order
-
-        // CAPTURE ORDER NUMBER
-
-        String orderNumber = checkoutPOM.captureOrderNumber(); // Get order number
-        System.out.println("Captured Order Number: " + orderNumber); // Print it
-        Helpers.takeScreenshot(driver, "Order Placed - " + orderNumber); // Screenshot
-
-        // VERIFY ORDER
-
-        assertThat("Order " + orderNumber + " should appear in My Account -> Orders",
-                ordersPOM.isOrderPresent(orderNumber), is(true)); // Check if order exists
+        // THEN: Order is captured successfully and visible in My Account
+        String orderNumber = captureOrderNumber();
+        verifyOrderInAccount(orderNumber);
 
         // CLEANUP
+        cleanup(orderNumber);
+    }
 
-        cartPOM.removeProduct(); // Empty the cart
-        Helpers.takeScreenshot(driver, "Cart Emptied"); // Screenshot
+    // BDD STEPS
 
-        accountPOM.logout(); // Logout user
-        Helpers.takeScreenshot(driver, "Logged Out"); // Screenshot
+    @Step("GIVEN the user logs in")
+    void loginUser() {
+        loginPOM.open();
+        loginPOM.login();
+        Helpers.takeScreenshot(driver, "Login Success");
+    }
+
+    @Step("AND the user is logged in")
+    void verifyUserLoggedIn() {
+        assertThat("User should be logged in", loginPOM.isUserLoggedIn(), is(true));
+    }
+
+    @Step("AND the cart is emptied")
+    protected void emptyCart() {
+        navPOM.goToCart();
+        cartPOM.removeProduct();
+        Helpers.takeScreenshot(driver, "Cart Emptied Before Test");
+    }
+
+    @Step("WHEN the user adds '{productName}' to the cart")
+    void addProductToCart(String productName) {
+        navPOM.goToShop();
+        shopPOM.dismissPopupIfPresent();
+        shopPOM.addProductToCart(productName);
+        navPOM.goToCart();
+        Helpers.takeScreenshot(driver, "Cart Ready");
+    }
+
+    @Step("AND proceeds to checkout")
+    void proceedToCheckout() {
+        navPOM.goToCheckout();
+        checkoutPOM.fillBillingDetailsFromConfig();
+        Helpers.takeScreenshot(driver, "Billing Details Entered");
+        checkoutPOM.selectCheckPayments();
+        checkoutPOM.placeOrder();
+    }
+
+    @Step("THEN capture the order number")
+    String captureOrderNumber() {
+        String orderNumber = checkoutPOM.captureOrderNumber();
+        Helpers.takeScreenshot(driver, "Order Placed - " + orderNumber);
+        return orderNumber;
+    }
+
+    @Step("AND verify the order '{orderNumber}' is present in My Account")
+    void verifyOrderInAccount(String orderNumber) {
+        assertThat("Order should appear in My Account -> Orders",
+                ordersPOM.isOrderPresent(orderNumber), is(true));
+    }
+
+    @Step("CLEANUP: Empty cart and log out user after test")
+    void cleanup(String orderNumber) {
+        cartPOM.removeProduct();
+        Helpers.takeScreenshot(driver, "Cart Emptied After Test");
+        accountPOM.logout();
+        Helpers.takeScreenshot(driver, "Logged Out");
     }
 }
