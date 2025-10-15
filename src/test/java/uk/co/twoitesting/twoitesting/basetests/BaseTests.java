@@ -1,27 +1,25 @@
-// This is the package where this file lives. Think of it like a folder for your code.
 package uk.co.twoitesting.twoitesting.basetests;
 
-// Importing tools we need from other places to use in this file.
-import org.junit.jupiter.api.AfterEach; // Runs after each test
-import org.junit.jupiter.api.BeforeEach; // Runs before each test
-import org.openqa.selenium.WebDriver; // Lets us control a browser
-import org.openqa.selenium.support.ui.WebDriverWait; // Waits for things to load on a page
-import uk.co.twoitesting.twoitesting.pomclasses.*; // Import all main POM classes (like login, shop, cart)
-import uk.co.twoitesting.twoitesting.pomclasses.componentPOM.NavPOM; // Navigation bar POM
-import uk.co.twoitesting.twoitesting.pomclasses.componentPOM.PopUpPOM; // Pop-up POM
-import uk.co.twoitesting.twoitesting.utilities.Helpers; // Some helper functions we wrote
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import uk.co.twoitesting.twoitesting.pomclasses.*;
+import uk.co.twoitesting.twoitesting.pomclasses.componentPOM.NavPOM;
+import uk.co.twoitesting.twoitesting.pomclasses.componentPOM.PopUpPOM;
+import uk.co.twoitesting.twoitesting.utilities.Helpers;
 
-import java.time.Duration; // To define how long we wait
+import java.time.Duration;
 
-// This is the main class for all our tests. Other test classes can use it to share setup and teardown code.
 public class BaseTests {
 
-    // This is our browser driver. It talks to Chrome, Firefox, etc.
     protected WebDriver driver;
-    // This is used to wait for things to appear on the page before we try to click them.
     protected WebDriverWait wait;
 
-    // These are all the Page Object Model classes we use to interact with the website.
     protected LoginPOM loginPOM;
     protected ShopPOM shopPOM;
     protected CartPOM cartPOM;
@@ -32,62 +30,71 @@ public class BaseTests {
     protected OrdersPOM ordersPOM;
     protected Helpers helpers;
 
-    // This method runs before each test. It sets up the browser and all the pages we need.
     @BeforeEach
     void setUpBase() {
-        // Get the browser name from system properties. Default to "chrome" if nothing is provided.
         String browser = System.getProperty("browser", "chrome").toLowerCase();
+        String headless = System.getProperty("headless", "false").toLowerCase();
 
-        // Open the right browser based on what was passed in
         switch (browser) {
             case "firefox":
-                driver = new org.openqa.selenium.firefox.FirefoxDriver(); // Open Firefox
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+                if (headless.equals("true")) {
+                    System.out.println(">>> Running Firefox in HEADLESS mode <<<");
+                    firefoxOptions.addArguments("--headless");
+                    firefoxOptions.addArguments("--width=1920");
+                    firefoxOptions.addArguments("--height=1080");
+                }
+                driver = new FirefoxDriver(firefoxOptions);
                 break;
+
             case "chrome":
             default:
-                driver = new org.openqa.selenium.chrome.ChromeDriver(); // Open Chrome
+                ChromeOptions chromeOptions = new ChromeOptions();
+                if (headless.equals("true")) {
+                    System.out.println(">>> Running Chrome in HEADLESS mode <<<");
+                    chromeOptions.addArguments("--headless=new");
+                    chromeOptions.addArguments("--disable-gpu");
+                    chromeOptions.addArguments("--no-sandbox");
+                    chromeOptions.addArguments("--disable-dev-shm-usage");
+                    chromeOptions.addArguments("--window-size=1920,1080");
+                    chromeOptions.addArguments("--start-maximized");
+                }
+                driver = new ChromeDriver(chromeOptions);
                 break;
         }
 
-        driver.manage().window().maximize(); // Make the browser full screen
-        wait = new WebDriverWait(driver, Duration.ofSeconds(3)); // Wait up to 7 seconds for things to appear
-        helpers = new Helpers(); // Create a helpers object to use utility functions
+        driver.manage().window().maximize();
+        wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+        helpers = new Helpers();
 
-        // Initialize basic components first (these are independent)
-        popUpPOM = new PopUpPOM(driver, wait); // Pop-up handling
-        navPOM = new NavPOM(driver, wait); // Navigation bar
 
-        // Initialize the other pages (these might need navPOM)
-        loginPOM = new LoginPOM(driver, wait); // Login page
-        shopPOM = new ShopPOM(driver, wait); // Shop page
-        cartPOM = new CartPOM(driver, wait); // Cart page
-        accountPOM = new AccountPOM(driver, wait, navPOM); // Account page
-        checkoutPOM = new CheckoutPOM(driver, wait, navPOM); // Checkout page
-        ordersPOM = new OrdersPOM(driver, wait, navPOM); // Orders page
+
+        popUpPOM = new PopUpPOM(driver, wait);
+        navPOM = new NavPOM(driver, wait);
+        loginPOM = new LoginPOM(driver, wait);
+        shopPOM = new ShopPOM(driver, wait);
+        cartPOM = new CartPOM(driver, wait);
+        accountPOM = new AccountPOM(driver, wait, navPOM);
+        checkoutPOM = new CheckoutPOM(driver, wait, navPOM);
+        ordersPOM = new OrdersPOM(driver, wait, navPOM);
     }
 
-    // This method runs after each test. It cleans up everything.
     @AfterEach
     void tearDownBase() {
-        Helpers.takeScreenshot(driver, "FinalState"); // Take a screenshot of the final state
-        emptyCart(); // Remove anything left in the cart
-        accountPOM.logout(); // Log out from the account
-        driver.quit(); // Close the browser completely
+        Helpers.takeScreenshot(driver, "FinalState");
+        emptyCart();
+        accountPOM.logout();
+        driver.quit();
     }
 
-    // This method empties the cart. Useful to make sure tests start fresh.
     protected void emptyCart() {
         try {
-            // Go to the cart page
             driver.get(System.getProperty("base.url", "https://www.edgewordstraining.co.uk/demo-site") + "/cart/");
-            // Remove coupons if any
             cartPOM.removeCoupon("edgewords");
             cartPOM.removeCoupon("2idiscount");
-            // Remove any products in the cart
             cartPOM.removeProduct();
-            System.out.println("Cart emptied successfully."); // Let us know it worked
+            System.out.println("Cart emptied successfully.");
         } catch (Exception e) {
-            // If something goes wrong (like cart is already empty), just print a message
             System.out.println("Cart already empty or error: " + e.getMessage());
         }
     }
