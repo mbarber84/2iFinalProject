@@ -1,96 +1,52 @@
 package uk.co.twoitesting.twoitesting.test;
 
 import io.qameta.allure.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.co.twoitesting.twoitesting.basetests.BaseTests;
-import uk.co.twoitesting.twoitesting.utilities.Helpers;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import uk.co.twoitesting.twoitesting.steps.*;
 
 public class FullPurchaseFlowTest extends BaseTests {
 
+    private LoginSteps loginSteps;
+    private ShopSteps shopSteps;
+    private CartSteps cartSteps;
+    private CheckoutSteps checkoutSteps;
+    private OrdersSteps ordersSteps;
+
+    @BeforeEach
+    void initSteps() {
+        // POMs are initialized in BaseTests @BeforeEach already
+        loginSteps = new LoginSteps(loginPOM, accountPOM);
+        shopSteps = new ShopSteps(shopPOM, popUpPOM);
+        cartSteps = new CartSteps(cartPOM, navPOM);
+        checkoutSteps = new CheckoutSteps(checkoutPOM);
+        ordersSteps = new OrdersSteps(ordersPOM);
+    }
+
     @Test
     @Tag("RunMe")
-    @Epic("Shop Tests")
-    @Feature("End-to-End Purchase Flow")
-    @Story("User can complete a full purchase and verify order")
     void testCompletePurchase() {
+        loginSteps.loginUser();
+        loginSteps.verifyUserLoggedIn();
 
-        // GIVEN: User is logged in and cart is empty
-        loginUser();
-        verifyUserLoggedIn();
-        emptyCart();
+        cartSteps.emptyCart();
 
-        // WHEN: User adds product to cart and proceeds to checkout
-        addProductToCart("Polo");
-        proceedToCheckout();
+        shopSteps.openShopAndDismissPopup();
+        shopSteps.addProductToCart("Polo");
 
-        // THEN: Order is captured successfully and visible in My Account
-        String orderNumber = captureOrderNumber();
-        verifyOrderInAccount(orderNumber);
+        cartSteps.goToCheckout();
 
-        // CLEANUP
-        cleanup(orderNumber);
-    }
+        checkoutSteps.fillBillingDetails();
+        checkoutSteps.selectCheckPayment();
+        checkoutSteps.placeOrder();
 
-    // BDD STEPS
+        String orderNumber = checkoutSteps.captureOrderNumber();
 
-    @Step("GIVEN the user logs in")
-    void loginUser() {
-        loginPOM.open();
-        loginPOM.login();
-        Helpers.takeScreenshot(driver, "Login Success");
-    }
+        ordersSteps.verifyOrderPresent(orderNumber);
 
-    @Step("AND the user is logged in")
-    void verifyUserLoggedIn() {
-        assertThat("User should be logged in", loginPOM.isUserLoggedIn(), is(true));
-    }
-
-    @Step("AND the cart is emptied")
-    protected void emptyCart() {
-        navPOM.goToCart();
-        cartPOM.removeProduct();
-        Helpers.takeScreenshot(driver, "Cart Emptied Before Test");
-    }
-
-    @Step("WHEN the user adds '{productName}' to the cart")
-    void addProductToCart(String productName) {
-        navPOM.goToShop();
-        shopPOM.dismissPopupIfPresent();
-        shopPOM.addProductToCart(productName);
-        navPOM.goToCart();
-        Helpers.takeScreenshot(driver, "Cart Ready");
-    }
-
-    @Step("AND proceeds to checkout")
-    void proceedToCheckout() {
-        navPOM.goToCheckout();
-        checkoutPOM.fillBillingDetailsFromConfig();
-        Helpers.takeScreenshot(driver, "Billing Details Entered");
-        checkoutPOM.selectCheckPayments();
-        checkoutPOM.placeOrder();
-    }
-
-    @Step("THEN capture the order number")
-    String captureOrderNumber() {
-        String orderNumber = checkoutPOM.captureOrderNumber();
-        Helpers.takeScreenshot(driver, "Order Placed - " + orderNumber);
-        return orderNumber;
-    }
-
-    @Step("AND verify the order '{orderNumber}' is present in My Account")
-    void verifyOrderInAccount(String orderNumber) {
-        assertThat("Order should appear in My Account -> Orders",
-                ordersPOM.isOrderPresent(orderNumber), is(true));
-    }
-
-    @Step("CLEANUP: Empty cart and log out user after test")
-    void cleanup(String orderNumber) {
-        cartPOM.removeProduct();
-        Helpers.takeScreenshot(driver, "Cart Emptied After Test");
-        accountPOM.logout();
-        Helpers.takeScreenshot(driver, "Logged Out");
+        cartSteps.emptyCart();
+        loginSteps.logoutUser();
     }
 }
