@@ -67,4 +67,8 @@ public class ShopActions {
             e.printStackTrace();
         }
     }
+
+    public WebDriver getDriver() {
+        return this.driver;
+    }
 }

@@ -24,6 +24,16 @@ public abstract class BasePOM {
         this.wait = wait; // Save the wait object
     }
 
+    // Public getter for driver
+    public WebDriver getDriver() {
+        return driver;
+    }
+
+    // Public getter for wait
+    public WebDriverWait getWait() {
+        return wait;
+    }
+
     // Helper method: wait for an element to appear and return it
     protected WebElement waitAndFind(By locator) {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
