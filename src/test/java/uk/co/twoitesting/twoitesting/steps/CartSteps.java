@@ -16,7 +16,7 @@ public class CartSteps {
         this.navPOM = navPOM;
     }
 
-    @Step("Empty the cart")
+    @Step("GIVEN the cart is empty")
     public void emptyCart() {
         cartPOM.removeProduct();
         cartPOM.removeCoupon("edgewords");
@@ -24,13 +24,13 @@ public class CartSteps {
         Helpers.takeScreenshot(cartPOM.getDriver(), "Cart Emptied");
     }
 
-    @Step("Apply coupon '{couponCode}'")
+    @Step("WHEN the coupon '{couponCode}' is applied")
     public void applyCoupon(String couponCode) {
         cartPOM.applyCoupon(couponCode);
         Helpers.takeScreenshot(cartPOM.getDriver(), "Applied Coupon " + couponCode);
     }
 
-    @Step("Proceed to checkout")
+    @Step("THEN the user proceeds to checkout")
     public void goToCheckout() {
         navPOM.goToCheckout();
         Helpers.takeScreenshot(cartPOM.getDriver(), "Navigated to Checkout");

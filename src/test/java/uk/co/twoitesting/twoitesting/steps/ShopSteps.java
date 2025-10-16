@@ -15,13 +15,13 @@ public class ShopSteps {
         this.popUpPOM = popUpPOM;
     }
 
-    @Step("Open Shop page and dismiss popup")
+    @Step("GIVEN the Shop page is opened and any popups are dismissed")
     public void openShopAndDismissPopup() {
         shopPOM.openShop();
         popUpPOM.dismissPopupIfPresent();
     }
 
-    @Step("Add product '{productName}' to cart and view cart")
+    @Step("AND the product '{productName}' is added to cart")
     public void addProductToCart(String productName) {
         shopPOM.addProductToCart(productName);
         Helpers.takeScreenshot(shopPOM.getShopActions().getDriver(), "Added " + productName + " to Cart");

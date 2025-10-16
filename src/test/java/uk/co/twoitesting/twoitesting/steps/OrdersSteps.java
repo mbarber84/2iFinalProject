@@ -14,7 +14,7 @@ public class OrdersSteps {
         this.ordersPOM = ordersPOM;
     }
 
-    @Step("Verify that order '{orderNumber}' exists in My Account")
+    @Step("THEN verify that order '{orderNumber}' exists in My Account")
     public void verifyOrderPresent(String orderNumber) {
         assertThat("Order should appear in My Account -> Orders",
                 ordersPOM.isOrderPresent(orderNumber), is(true));

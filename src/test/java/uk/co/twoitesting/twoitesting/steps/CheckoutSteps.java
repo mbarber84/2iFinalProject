@@ -12,23 +12,23 @@ public class CheckoutSteps {
         this.checkoutPOM = checkoutPOM;
     }
 
-    @Step("Fill billing details from config")
+    @Step("GIVEN billing details are filled from config")
     public void fillBillingDetails() {
         checkoutPOM.fillBillingDetailsFromConfig();
         Helpers.takeScreenshot(checkoutPOM.getDriver(), "Billing Details Entered");
     }
 
-    @Step("Select check payment method")
+    @Step("WHEN the user selects check payment method")
     public void selectCheckPayment() {
         checkoutPOM.selectCheckPayments();
     }
 
-    @Step("Place the order")
+    @Step("AND the user places the order")
     public void placeOrder() {
         checkoutPOM.placeOrder();
     }
 
-    @Step("Capture order number")
+    @Step("THEN the order number is captured")
     public String captureOrderNumber() {
         String orderNumber = checkoutPOM.captureOrderNumber();
         Helpers.takeScreenshot(checkoutPOM.getDriver(), "Order Placed - " + orderNumber);

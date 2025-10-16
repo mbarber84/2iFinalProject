@@ -80,7 +80,7 @@ public class CouponSteps {
                 subtotal, discount, total);
     }
 
-    @Step("AND the cart is cleaned after test")
+    @Step("THEN the cart is cleaned after test")
     public void cleanupCart(String couponCode) {
         cartPOM.removeCoupon(couponCode);
         cartPOM.removeProduct();

@@ -25,12 +25,12 @@ public class LoginSteps {
         Helpers.takeScreenshot(loginPOM.getDriver(), "Login Success");
     }
 
-    @Step("AND the user is logged in")
+    @Step("THEN the user is logged in successfully")
     public void verifyUserLoggedIn() {
         assertThat("User should be logged in", loginPOM.isUserLoggedIn(), is(true));
     }
 
-    @Step("AND the user logs out")
+    @Step("THEN the user logs out")
     public void logoutUser() {
         accountPOM.logout();
         Helpers.takeScreenshot(loginPOM.getDriver(), "Logged Out");
